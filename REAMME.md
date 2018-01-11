@@ -42,14 +42,27 @@ If you are using Docker Machine, run this command to get your current Docker hos
 $ docker-machine ip <your_docker_machine_name>
 ```
 
-### Application server
 
-After having started all Docker containers via the `docker-compose`
-command, the application will be reachable at:
-if you are using docker-machine
-[http://\<your_docker_machine_ip\>:3000/](http://your_docker_machine_ip:3000/)
-if you are using docker for mac
-[http://\<localhost\>:3000/](http://localhost:3000/)
+#### Browse Decidim
+
+After you create a development app (`bundle exec rake development_app`):
+
+* `cd development_app`
+* `bundle exec rails s`
+* Go to 'http://localhost:3000'
+
+Optionally, you can log in as: user@example.org | decidim123456
+
+Also, if you want to verify yourself against the default authorization handler use a document number ended with "X".
+
+#### Browse Admin Interface
+
+After you create a development app (`bundle exec rake development_app`):
+
+* `cd development_app`
+* `bundle exec rails s`
+* Go to 'http://localhost:3000/admin'
+* Login data: admin@example.org | decidim123456
 
 ## Example applications
 
