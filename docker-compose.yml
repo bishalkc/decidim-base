@@ -1,0 +1,34 @@
+version: '3'
+services:
+  decidim_app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    entrypoint: []
+    command: bundle exec puma
+    working_dir: "/decidim/development_app"
+    environment:
+      - PORT=3000
+      - DATABASE_HOST=pg
+      - DATABASE_USERNAME=decidim
+      - DATABASE_PASSWORD=decidimdemo
+      - DATABASE_NAME=decidim
+      - RAILS_ENV=development
+    links:
+      - decidim_db:pg
+      - decidim_redis:redis
+    ports:
+      - 3000:3000
+  decidim_db:
+    image: postgres
+    environment:
+      - POSTGRES_USER=decidim
+      - POSTGRES_PASSWORD=decidimdemo
+      - POSTGRES_DB=decidim
+      - PG_TRUST_LOCALNET=true
+    volumes:
+      - ./pg-data:/var/lib/postgresql/data
+  decidim_redis:
+    image: redis
+    volumes:
+      - ./redis-data:/data
