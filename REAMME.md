@@ -47,8 +47,8 @@ $ docker-machine ip <your_docker_machine_name>
 
 After you create a development app (`bundle exec rake development_app`):
 
-* `cd development_app`
-* `bundle exec rails s`
+* `cd decidim_base`
+* `docker-compose up -d`
 * Go to 'http://localhost:3000'
 
 Optionally, you can log in as: user@example.org | decidim123456
@@ -59,9 +59,9 @@ Also, if you want to verify yourself against the default authorization handler u
 
 After you create a development app (`bundle exec rake development_app`):
 
-* `cd development_app`
-* `bundle exec rails s`
-* Go to 'http://localhost:3000/admin'
+* `cd decidim_base`
+* `docker-compose up -d`
+* Go to 'http://localhost:3000/user/sign_in'
 * Login data: admin@example.org | decidim123456
 
 ## Example applications
