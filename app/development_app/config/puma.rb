@@ -1,56 +1,156 @@
-# Puma can serve each request in a thread from an internal thread pool.
-# The `threads` method setting takes two numbers: a minimum and maximum.
-# Any libraries that use thread pools should be configured to match
-# the maximum value specified for Puma. Default is set to 5 threads for minimum
-# and maximum; this matches the default thread size of Active Record.
+# The directory to operate out of.
 #
-threads_count = ENV.fetch("RAILS_MAX_THREADS") { 5 }
+# The default is the current directory.
+#
+#
+pidfile 'tmp/pids/puma.pid'
+
+# Use "path" as the file to store the server info state. This is
+# used by "pumactl" to query and control the server.
+#
+state_path 'tmp/pids/puma.state'
+
+# Redirect STDOUT and STDERR to files specified. The 3rd parameter
+# ("append") specifies whether the output is appended, the default is
+# "false".
+#
+stdout_redirect 'log/puma.stdout.log',
+  'log/puma.stderr.log',
+  true
+
+# Disable request logging.
+#
+# The default is "false".
+#
+# quiet
+
+# Configure "min" to be the minimum number of threads to use to answer
+# requests and "max" the maximum.
+#
+# The default is "0, 16".
+#
+threads_count = ENV.fetch("RAILS_MAX_THREADS") { 10 }
 threads threads_count, threads_count
 
 # Specifies the `port` that Puma will listen on to receive requests; default is 3000.
 #
-port        ENV.fetch("PORT") { 3000 }
-
 # Specifies the `environment` that Puma will run in.
 #
 environment ENV.fetch("RAILS_ENV") { "development" }
 
-# Specifies the number of `workers` to boot in clustered mode.
-# Workers are forked webserver processes. If using threads and workers together
-# the concurrency of the application would be max `threads` * `workers`.
-# Workers do not work on JRuby or Windows (both of which do not support
-# processes).
+# Bind the server to "url". "tcp://", "unix://" and "ssl://" are the only
+# accepted protocols.
 #
-# workers ENV.fetch("WEB_CONCURRENCY") { 2 }
+# The default is "tcp://0.0.0.0:9292".
+#
+# bind 'tcp://0.0.0.0:9292'
+# bind 'unix:///var/run/puma.sock'
+# bind 'unix:///var/run/puma.sock?umask=0111'
+# bind 'ssl://127.0.0.1:9292?key=path_to_key&cert=path_to_cert'
+bind "ssl://0.0.0.0:#{ENV.fetch('PUMA_PORT', 80)}?key=#{ENV.fetch('APP_HOME')}/.ssh/localhost.key&cert=#{ENV.fetch('APP_HOME')}/.ssh/localhost.crt"
 
-# Use the `preload_app!` method when specifying a `workers` number.
-# This directive tells Puma to first boot the application and load code
-# before forking the application. This takes advantage of Copy On Write
-# process behavior so workers use less memory. If you use this option
-# you need to make sure to reconnect any threads in the `on_worker_boot`
-# block.
+# Instead of "bind 'ssl://127.0.0.1:9292?key=path_to_key&cert=path_to_cert'" you
+# can also use the "ssl_bind" option.
 #
-# preload_app!
+# ssl_bind '127.0.0.1', '9292', { key: path_to_key, cert: path_to_cert }
 
-# If you are preloading your application and using Active Record, it's
-# recommended that you close any connections to the database before workers
-# are forked to prevent connection leakage.
+# Code to run before doing a restart. This code should
+# close log files, database connections, etc.
 #
-# before_fork do
-#   ActiveRecord::Base.connection_pool.disconnect! if defined?(ActiveRecord)
+# This can be called multiple times to add code each time.
+#
+# on_restart do
+#   puts 'On restart...'
 # end
 
-# The code in the `on_worker_boot` will be called if you are using
-# clustered mode by specifying a number of `workers`. After each worker
-# process is booted, this block will be run. If you are using the `preload_app!`
-# option, you will want to use this block to reconnect to any threads
-# or connections that may have been created at application boot, as Ruby
-# cannot share connections between processes.
+on_restart do
+  ActiveRecord::Base.connection.disconnect! if defined?(ActiveRecord::Base)
+end
+
+# Command to use to restart puma. This should be just how to
+# load puma itself (ie. 'ruby -Ilib bin/puma'), not the arguments
+# to puma, as those are the same as the original process.
+#
+# restart_command '/u/app/lolcat/bin/restart_puma'
+
+# === Cluster mode ===
+
+# How many worker processes to run.
+#
+# The default is "0".
+#
+workers ENV.fetch("WEB_CONCURRENCY") { 3 }
+
+# Code to run when a worker boots to setup the process before booting
+# the app.
+#
+# This can be called multiple times to add hooks.
 #
 # on_worker_boot do
-#   ActiveRecord::Base.establish_connection if defined?(ActiveRecord)
+#   puts 'On worker boot...'
 # end
-#
 
-# Allow puma to be restarted by `rails restart` command.
-plugin :tmp_restart
+on_worker_boot do
+  ActiveRecord::Base.establish_connection if defined?(ActiveRecord::Base)
+end
+
+# Code to run when a worker boots to setup the process after booting
+# the app.
+#
+# This can be called multiple times to add hooks.
+#
+# after_worker_boot do
+#   puts 'After worker boot...'
+# end
+
+# Code to run when a worker shutdown.
+#
+#
+# on_worker_shutdown do
+#   puts 'On worker shutdown...'
+# end
+
+# Allow workers to reload bundler context when master process is issued
+# a USR1 signal. This allows proper reloading of gems while the master
+# is preserved across a phased-restart. (incompatible with preload_app)
+# (off by default)
+
+# prune_bundler
+
+# Preload the application before starting the workers; this conflicts with
+# phased restart feature. (off by default)
+
+preload_app!
+
+#
+# If you do not specify a tag, Puma will infer it. If you do not want Puma
+# to add a tag, use an empty string.
+
+# Verifies that all workers have checked in to the master process within
+# the given timeout. If not the worker process will be restarted. Default
+# value is 60 seconds.
+#
+worker_timeout 60
+
+# Change the default worker timeout for booting
+#
+# If unspecified, this defaults to the value of worker_timeout.
+#
+# worker_boot_timeout 60
+
+# === Puma control rack application ===
+
+# Start the puma control rack application on "url". This application can
+# be communicated with to control the main server. Additionally, you can
+# provide an authentication token, so all requests to the control server
+# will need to include that token as a query parameter. This allows for
+# simple authentication.
+#
+# Check out https://github.com/puma/puma/blob/master/lib/puma/app/status.rb
+# to see what the app has available.
+#
+# activate_control_app 'unix:///var/run/pumactl.sock'
+# activate_control_app 'unix:///var/run/pumactl.sock', { auth_token: '12345' }
+# activate_control_app 'unix:///var/run/pumactl.sock', { no_token: true }
+#
+# vim: set ft=ruby:

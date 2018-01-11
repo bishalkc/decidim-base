@@ -49,8 +49,8 @@ After you create a development app (`bundle exec rake development_app`):
 
 * `cd decidim_base`
 * `docker-compose up -d`
-* Go to 'http://localhost:3000'
-
+* Go to 'https://localhost:3000'
+   Note: You will have to accept the cert warning
 Optionally, you can log in as: user@example.org | decidim123456
 
 Also, if you want to verify yourself against the default authorization handler use a document number ended with "X".
@@ -61,9 +61,9 @@ After you create a development app (`bundle exec rake development_app`):
 
 * `cd decidim_base`
 * `docker-compose up -d`
-* Go to 'http://localhost:3000/user/sign_in'
+* Go to 'https://localhost:3000/user/sign_in'
 * Login data: admin@example.org | decidim123456
-
+   Note: You will have to accept the cert warning
 ## Example applications
 
 Since Decidim is a ruby gem, you can check out the [dependent repositories](https://github.com/decidim/decidim/network/dependents?type=application) to see how many applications are on the wild or tests that other developers have made. Here's a partial list with some of the projects that have used Decidim:
