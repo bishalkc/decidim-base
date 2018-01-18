@@ -24,7 +24,7 @@ $ mkdir -p pg-data redis-data
 ### run the app  
 ```
 $ docker-compose up -d
-$ docker-compose run decidim_app run db:migrate db:seed
+$ docker-compose run decidim_app rake db:migrate db:seed
 $ docker-compose restart
 ```
 
