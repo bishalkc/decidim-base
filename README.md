@@ -64,6 +64,12 @@ After you create a development app (`bundle exec rake development_app`):
 * Go to 'https://localhost:3000/user/sign_in'
 * Login data: admin@example.org | decidim123456
    Note: You will have to accept the cert warning
+
+#### Browse System Admin Interface   
+* Go to 'https://localhost:3000/admin'
+* Login data: system@example.org | decidim123456
+   Note: You will have to accept the cert warning
+
 ## Example applications
 
 Since Decidim is a ruby gem, you can check out the [dependent repositories](https://github.com/decidim/decidim/network/dependents?type=application) to see how many applications are on the wild or tests that other developers have made. Here's a partial list with some of the projects that have used Decidim:
