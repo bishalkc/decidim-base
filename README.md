@@ -23,15 +23,25 @@ $ mkdir -p pg-data redis-data
 
 ### run the app  
 ```
+$ docker-compose build
 $ docker-compose up -d
-$ docker-compose run decidim_app rake db:migrate db:seed
-$ docker-compose restart
+$ docker-compose run decidim_app rake db:migrate
+$ docker ps (find the container id or container name)
+$ docker exec -it  <containerid or containername> bash
+$ rails console
+$ paste the below code in console and presee enter
+Decidim::System::Admin.create!(
+  email: "system@example.org",
+  password: "decidim123456",
+  password_confirmation: "decidim123456"
+)
+$ docker-compose decidim_app restart
 ```
 
 ### Seeding the databases  
 
 ```shell
-$ docker-compose run decidim_app run db:migrate db:seed
+$ docker-compose run decidim_app run db:migrate
 ```
 
 ### Accessing the Docker host

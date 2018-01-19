@@ -4,8 +4,6 @@ services:
     build:
       context: ./app
       dockerfile: Dockerfile
-    entrypoint: []
-    command: bundle exec puma
     working_dir: "/decidim/development_app"
     environment:
       - PUMA_PORT=3000
@@ -18,7 +16,7 @@ services:
       - decidim_db:pg
       - decidim_redis:redis
     ports:
-      - 3000:3000
+      - 443:3000
   decidim_db:
     image: postgres
     environment:
